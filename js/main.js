@@ -289,7 +289,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // プレイヤーの移動
 function move() {
-  player.position.z -= 0.3
+  player.position.z -= 0.2
   if (gamma !== 0 ){
     if (player.position.x <= 5 && player.position.x >= -5){
       if(gamma / 5 > -5 && gamma / 5 < 5){
