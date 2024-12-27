@@ -39,7 +39,7 @@ let helper;
 let player;
 let playerBox;
 let player_v_y = 0;
-const initial_velocity = 1.2;
+const initial_velocity = 1;
 let isJumping = false;
 let isMoving = false;
 let box_X;
@@ -289,7 +289,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // プレイヤーの移動
 function move() {
-  player.position.z -= 0.2
+  player.position.z -= 0.3
   if (gamma !== 0 ){
     if (player.position.x <= 5 && player.position.x >= -5){
       if(gamma / 5 > -5 && gamma / 5 < 5){
