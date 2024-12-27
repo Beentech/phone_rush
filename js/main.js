@@ -24,7 +24,7 @@ const course = [-5, 0, 5];
 let mixer;
 
 // エリアの設定
-const gravity = 0.05; // 重力
+const gravity = 0.03; // 重力
 
 let isOnce = false;
 let ios = true;
