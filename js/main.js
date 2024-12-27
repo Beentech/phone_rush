@@ -289,7 +289,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // プレイヤーの移動
 function move() {
-  player.position.z -= 0.2;
+  if (gamma > 20 && !isMoving){
+    if (index < 3){
+     isMoving = true;
+     index += 1;
+     player.position.x = course[index];
+   }
+  }else if (gamma < -20 && !isMoving){
+     if (index > -1){
+     isMoving = true;
+     index -= 1;
+     player.position.x = course[index]
+    }
+   }else if(gamma < 5 && gamma > -5){
+     isMoving = false;
+  }
 }
 
 // プレイヤーのジャンプ
