@@ -289,33 +289,34 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // プレイヤーの移動
 function move() {
-  if (gamma > 20 && !isMoving){
-    if (index < 3){
-     isMoving = true;
-     index += 1;
-     player.position.x = course[index];
+  player.position.z -= 0.2
+  if (gamma !== 0 ){
+    if (player.position.x < 5 && player.position.x > -5){
+     player.position.x = gamma / 5;
    }
-  }else if (gamma < -20 && !isMoving){
-     if (index > -1){
-     isMoving = true;
-     index -= 1;
-     player.position.x = course[index]
-    }
-   }else if(gamma < 5 && gamma > -5){
-     isMoving = false;
   }
 }
 
 // プレイヤーのジャンプ
 function jump() {
-  // ここに追加
+  if (!isJumping && aZ > 0){
+    player_v_y = initial_velocity;
+    isJumping = true;
+  }else if (isJumping){
+    player_v_y -= gravity;
+    player.position.y += player_v_y;
+    if (player.position.y <= 0){
+      isJumping = false;
+      player.position.y = 0;
+    }
+  }
 }
 
 // 衝突判定
 function collision() {
-  box_X = 0;
-  box_Y = 0;
-  box_Z = 0; // サイズが合うように変えてみましょう。
+  box_X = 1.75;
+  box_Y = 5.25;
+  box_Z = 3; // サイズが合うように変えてみましょう。
   geometry = new BoxGeometry(box_X, box_Y, box_Z);
   sphereMaterial = new MeshPhongMaterial({ color: 0xff0000 });
   playerBox = new Mesh(geometry, sphereMaterial);
@@ -330,10 +331,34 @@ function collision() {
   scene.add(helper);
 
   // 障害物との衝突
-  // ここに追加
+  enemy_list = enemy_list.filter((enemy) => {
+    const enemyBoundingBox = new Box3().setFromObject(enemy);
+    helper = new Box3Helper(enemyBoundingBox, 0xff0000);
+    scene.add(helper)
+
+    const isCollited = playerBoundingBox.intersectsBox(enemyBoundingBox);
+    if (isCollited){
+      window.location.href = "./index.html";
+      return false;
+    }
+    return true;
+  });
+
+
 
   // スマホとの衝突
-  // ここに追加
+  phone_list = phone_list.filter((phone) => {
+    const phoneBoundingBox = new Box3().setFromObject(phone)
+    helper = new Box3Helper(phoneBoundingBox, 0xff0000);
+    scene.add(helper);
+
+    const isCollited = playerBoundingBox.intersectsBox(phoneBoundingBox);
+    if (isCollited){
+      scene.remove(phone);
+      return false;
+    }
+    return true;
+  });
 
   // ゴールとの衝突
   if (goal) {
@@ -357,9 +382,9 @@ function animate() {
     // 移動関数の実行
     move();
     // ジャンプ関数の実行
-    // ここに追加
+    jump();
     // 衝突判定関数の実行
-    // ここに追加
+    collision();
     // カメラの移動
     camera.position.set(0, 8, player.position.z + 10);
     camera.lookAt(new Vector3(0, 5, player.position.z));
