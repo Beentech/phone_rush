@@ -71,7 +71,7 @@ const camera = new PerspectiveCamera(
   0.1,
   10000
 );
-camera.position.set(0, 4, 10);
+
 
 // レンダラー
 const renderer = new WebGLRenderer({
@@ -108,7 +108,27 @@ const textureloader = new TextureLoader();
 const glbloader = new GLTFLoader();
 
 // プレイヤーの描画
-// ここに記述
+glbloader.load(
+  glbUrls[0], 
+  function (gltf){
+    player = gltf.scene;
+    player.scale.set(3, 3, 3);
+    player.rotation.set(0, Math.PI, 0);
+    player.position.set(0, 0, 0);
+    mixer = new AnimationMixer(player);
+    const runningAction = gltf.animations.find((animation) => animation.name === "runnning");
+    if (runningAction){
+      mixer.clipAction(runningAction).play();
+    } else{
+      console.warn("Running animation not found in the model.");
+    }
+    scene.add(player);
+  }, 
+  undefined, 
+  function(error){
+    console.error(error)
+  }
+)
 
 // 建物の描画
 glbloader.load(
@@ -130,7 +150,24 @@ glbloader.load(
 );
 
 // スマホの描画
-// ここに記述
+glbloader.load(
+  glbUrls[2], 
+  function(gltf){
+    for(let g = 1; g < 10; g++){
+      model = gltf.scene.clone();
+      model.scale.set(15, 15, 15);
+      model.rotation.set(0, Math.PI / 4 , Math.PI /4);
+      const randomIndex = Math.floor(Math.random() *3);
+      model.position.set(course[randomIndex], 2, -10 * g);
+      phone_list.push(model);
+      scene.add(model);
+   }
+ }, 
+ undefined, 
+ function(error){
+  console.error(error)
+ }
+)
 
 // 障害物の描画
 for (let g = 1; g < 12; g++) {
@@ -161,8 +198,22 @@ textureloader.load(
   }
 );
 
-// ゴールの描画
-// ここに記述
+textureloader.load(
+  textureUrls[1], 
+  function(texture){
+    geometry = new BoxGeometry(24, 10, 0.5);
+    sphereMaterial = new MeshPhongMaterial();
+    sphereMaterial.map = texture;
+    goal = new Mesh(geometry, sphereMaterial);
+    goal.position.set(0, 5, -200);
+    goalBoundingBox = new Box3().setFromObject(goal);
+    scene.add(goal);
+  }, 
+  undefined, 
+  function(error){
+    console.error(error)
+  } 
+);
 
 // センサの値の読み取り
 document.addEventListener("DOMContentLoaded", function () {
@@ -185,20 +236,30 @@ document.addEventListener("DOMContentLoaded", function () {
   // 加速度センサの値の取得
   window.addEventListener("devicemotion", (dat) => {
     if (ios) {
-      // iOS の時
-      // ここに追加
+      aX = dat.accelerationIncludingGravity.x || 0;
+      aY = dat.accelerationIncludingGravity.y || 0;
+      aZ = dat.accelerationIncludingGravity.z || 0;
     } else {
-      // android の時
-      // ここに追加
+      aX = -1 * dat.accelerationIncludingGravity.x || 0;
+      aY = -1 * dat.accelerationIncludingGravity.y || 0;
+      aZ = -1 * dat.accelerationIncludingGravity.z || 0;
     }
+    console.log(aX, aY, aZ);
   });
 
   // ジャイロセンサの値の取得
-  // ここに追加
+  window.addEventListener("deviceorientation", 
+    (event) => {
+      alpha = event.alpha || 0;
+      beta = event.beta || 0;
+      gamma = event.gamma || 0;
+      console.log("Gyro:", alpha, beta, gamma);
+    }
+  )
 
   // 一定時間ごとに
   let graphtimer = window.setInterval(() => {
-    // ここに追加
+    displayData();
   }, 33);
 
   // 描画する関数
@@ -228,7 +289,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // プレイヤーの移動
 function move() {
-  // ここに追加
+  player.position.z -= 0.2;
 }
 
 // プレイヤーのジャンプ
@@ -274,17 +335,20 @@ function animate() {
   const animationId = requestAnimationFrame(animate);
 
   // Mixer
-  // ここに追加
+  if (mixer){
+    mixer.update(0.016)
+  }
 
   if (player) {
     // 移動関数の実行
-    // ここに追加
+    move();
     // ジャンプ関数の実行
     // ここに追加
     // 衝突判定関数の実行
     // ここに追加
     // カメラの移動
-    // ここに追加
+    camera.position.set(0, 8, player.position.z + 10);
+    camera.lookAt(new Vector3(0, 5, player.position.z));
   }
   renderer.render(scene, camera);
 }
