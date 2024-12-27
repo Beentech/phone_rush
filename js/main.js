@@ -171,7 +171,7 @@ glbloader.load(
 
 // 障害物の描画
 for (let g = 1; g < 12; g++) {
-  geometry = new ConeGeometry(1, 4, 32);
+  geometry = new ConeGeometry(1, 3, 32);
   sphereMaterial = new MeshPhongMaterial({ color: 0xff0000 });
   const model = new Mesh(geometry, sphereMaterial);
   const randomIndex = Math.floor(Math.random() * 3);
