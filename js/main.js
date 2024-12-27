@@ -292,7 +292,13 @@ function move() {
   player.position.z -= 0.2
   if (gamma !== 0 ){
     if (player.position.x <= 5 && player.position.x >= -5){
-     player.position.x = gamma / 5;
+      if(gamma / 5 > -5 && gamma / 5 < 5){
+        player.position.x = gamma / 5
+      }else if (gamma / 5 >= 5){
+        player.position.x = 4.9
+      }else{
+        player.position.x = -4.9
+      }
    }
   }
 }
